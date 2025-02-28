@@ -1,0 +1,125 @@
+.column-control,
+.row-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: var(--accent-color);
+    border-radius: 50%;
+    cursor: pointer;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    user-select: none;
+}
+
+.column-control {
+    grid-area: controls;
+    position: relative;
+    margin: 0;
+    align-self: center;
+}
+
+.row-control {
+    grid-area: row-controls;
+    justify-self: center;
+    margin: 0;
+}
+
+.column-control:hover,
+.row-control:hover {
+    background: #0056b3;
+}
+
+.weight-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    cursor: pointer;
+    background: var(--input-bg);
+    border-radius: var(--border-radius);
+    height: 24px;
+}
+
+.weight-control span {
+    font-family: 'Courier New', Courier, monospace;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+}
+
+.editable-label {
+    background: none;
+    border: 1px solid transparent;
+    color: var(--text-primary);
+    font-size: 1rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--border-radius);
+    width: 100%;
+    transition: all 0.2s ease;
+}
+
+.editable-label:hover {
+    border-color: var(--accent-color);
+}
+
+.editable-label:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    background: var(--input-bg);
+}
+
+.scale-mode-toggle {
+    grid-area: scale-toggle;
+    align-self: start;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+}
+
+.toggle-switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    display: inline-block;
+}
+
+.toggle-switch input {
+    display: none;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--input-bg);
+    border-radius: 24px;
+    transition: 0.4s;
+}
+
+.toggle-slider:before {
+    content: "";
+    position: absolute;
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background: var(--text-primary);
+    border-radius: 50%;
+    transition: 0.4s;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background: var(--accent-color);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(20px);
+} 

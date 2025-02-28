@@ -1,0 +1,14 @@
+:root {
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --text-primary: #ffffff;
+    --text-secondary: #b3b3b3;
+    --accent-color: #007AFF;
+    --border-color: #404040;
+    --danger-color: #FF453A;
+    --success-color: #32D74B;
+    --input-bg: #3d3d3d;
+    --cell-size: 40px;
+    --spacing: 1px;
+    --border-radius: 4px;
+} 

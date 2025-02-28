@@ -1,492 +1,158 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-gray-900">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A powerful web-based decision-making tool that helps you evaluate options against multiple criteria using weighted scores.">
+    <meta name="keywords" content="decision matrix, weighted matrix, decision making, prioritization tool">
+    <meta name="author" content="Your Name">
+    <meta name="theme-color" content="#3b82f6">
+    
     <title>Weighted Matrix Tool</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="icons/favicon.ico">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    
+    <!-- Manifest for PWA -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="src/styles/main.css">
-    <script type="module">
-        import { WeightedMatrix } from './src/js/matrix.js';
-        import config from './src/js/config.js';
-
-        // Configure Tailwind
-        tailwind.config = config;
-
-        // Initialize the matrix when the DOM is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            window.matrix = new WeightedMatrix();
-        });
-    </script>
+    
+    <!-- Preload critical JavaScript -->
+    <link rel="preload" href="src/js/index.js" as="script">
+    
+    <!-- Main JavaScript module -->
+    <script type="module" src="src/js/index.js" defer></script>
 </head>
-<body class="h-full text-gray-100">
-    <div class="min-h-full p-4 sm:p-6 lg:p-8">
-        <div class="mx-auto max-w-7xl">
-            <div id="matrixScreen" class="bg-gray-800 rounded-2xl shadow-xl p-6">
-                <!-- Matrix Controls -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-                    <button onclick="addRow()" class="btn-secondary">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                        </svg>
-                        Add Row
-                    </button>
-                    <button onclick="removeRow()" class="btn-secondary">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
-                        </svg>
-                        Remove Row
-                    </button>
-                    <button onclick="addColumn()" class="btn-secondary">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                        </svg>
-                        Add Column
-                    </button>
-                    <button onclick="removeColumn()" class="btn-secondary">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
-                        </svg>
-                        Remove Column
-                    </button>
-                </div>
-
-                <!-- Matrix Container -->
-                <div class="overflow-x-auto">
-                    <div id="matrixContainer" class="min-w-full"></div>
-                </div>
-
-                <!-- Heatmap Scale -->
-                <div class="mt-8 bg-gray-700/50 rounded-xl p-4">
-                    <div class="max-w-2xl mx-auto">
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="text-sm font-medium text-gray-300">Weighted Value Scale</span>
-                            <div class="flex items-center gap-3 bg-gray-800 rounded-lg p-2">
-                                <span class="text-sm text-gray-300">Dynamic Scale</span>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" id="scaleToggle" class="sr-only peer" checked onchange="updateMatrix()">
-                                    <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="h-5 rounded bg-gradient-to-r from-danger via-gray-700/20 to-success"></div>
-                        <div class="flex justify-between mt-2 text-sm text-gray-400">
-                            <span id="minLabel">Negative Impact (-10)</span>
-                            <span>Neutral (0)</span>
-                            <span id="maxLabel">Positive Impact (+10)</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-8">
-                    <button onclick="createMatrix()" class="btn-primary">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                        </svg>
-                        Start Over
-                    </button>
-                    <button onclick="copyAsMarkdown()" class="btn-primary">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
-                        </svg>
-                        Copy as Markdown
-                    </button>
+<body>
+    <div class="container">
+        <header class="app-header">
+            <div class="app-title">
+                <h1>Weighted Matrix Tool</h1>
+                <div class="theme-toggle">
+                    <label class="toggle-switch" for="themeToggle">
+                        <input type="checkbox" id="themeToggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="toggle-label">Dark Mode</span>
                 </div>
             </div>
-        </div>
+            <p class="text-muted">A tool for making weighted decisions</p>
+        </header>
+
+        <main class="main-content">
+            <div class="matrix-section">
+                <section class="section">
+                    <h2 class="section-title">Matrix Controls</h2>
+                    <div class="matrix-controls">
+                        <div class="control-group">
+                            <h3 class="control-group-title">Rows</h3>
+                            <div class="btn-group">
+                                <button id="addRowButton" class="btn btn-primary">Add Row</button>
+                                <button id="removeRowButton" class="btn btn-danger">Remove Row</button>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <h3 class="control-group-title">Columns</h3>
+                            <div class="btn-group">
+                                <button id="addColumnButton" class="btn btn-primary">Add Column</button>
+                                <button id="removeColumnButton" class="btn btn-danger">Remove Column</button>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <h3 class="control-group-title">Matrix</h3>
+                            <div class="btn-group">
+                                <button id="resetButton" class="btn btn-secondary">Reset Matrix</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <h2 class="section-title">Decision Matrix</h2>
+                    <div class="matrix-container">
+                        <div class="matrix-table-container">
+                            <table class="matrix-table"></table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="settings-section">
+                <section class="section heatmap-container">
+                    <h2 class="section-title">Heatmap Settings</h2>
+                    <div class="heatmap-controls">
+                        <div class="control-group">
+                            <div class="scale-toggle-container">
+                                <label class="toggle-switch" for="scaleToggle">
+                                    <input type="checkbox" id="scaleToggle">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span class="toggle-label">Dynamic Scale</span>
+                            </div>
+                            <p class="text-muted">When enabled, colors are based on the actual range of values in the matrix.</p>
+                        </div>
+                        <div class="control-group">
+                            <div class="opacity-slider-container">
+                                <label class="opacity-slider-label">
+                                    <span>Color Intensity</span>
+                                    <span id="opacityValue">50%</span>
+                                </label>
+                                <input type="range" id="opacitySlider" min="10" max="100" value="50" class="opacity-slider">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="heatmap-scale">
+                        <div class="scale-labels">
+                            <span id="minLabel">Negative Impact (-10.0)</span>
+                            <span id="maxLabel">Positive Impact (+10.0)</span>
+                        </div>
+                        <div class="scale-gradient"></div>
+                    </div>
+                </section>
+
+                <section class="export-section">
+                    <h2 class="export-title">Export Results</h2>
+                    <div class="export-controls">
+                        <button id="convertButton" class="export-button">Convert to Markdown</button>
+                        <button id="copyButton" class="export-button copy-button hidden">Copy to Clipboard</button>
+                    </div>
+                    <div class="export-preview-container">
+                        <pre id="markdownPreview" class="export-preview"></pre>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <footer class="app-footer">
+            <p>&copy; <span id="current-year">2023</span> Weighted Matrix Tool. All rights reserved.</p>
+            <p class="text-muted">
+                <a href="https://github.com/yourusername/weighted-matrix-tool" target="_blank" rel="noopener noreferrer">View on GitHub</a>
+            </p>
+        </footer>
     </div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 opacity-0 transition-opacity duration-300 bg-primary text-white px-6 py-3 rounded-lg shadow-lg"></div>
+    <div id="toast-container" class="toast-container"></div>
 
-    <style>
-        /* Base styles for matrix table */
-        .matrix-table {
-            @apply w-full border-separate border-spacing-1 relative;
-        }
-        .matrix-table th, .matrix-table td {
-            @apply p-3 text-center bg-gray-700/50 rounded-lg text-gray-100;
-        }
-        .matrix-table th {
-            @apply bg-primary/90 font-semibold;
-        }
-        .matrix-table td:first-child {
-            @apply text-right bg-gray-700/80;
-        }
-        .title-cell {
-            @apply bg-primary/90 font-semibold;
-        }
-        
-        /* Input styles */
-        .matrix-table input {
-            @apply bg-transparent text-gray-100;
-        }
-        
-        .editable-label {
-            @apply border border-transparent rounded px-2 py-1 text-center min-w-[60px] transition-all duration-200 hover:border-gray-600 focus:outline-none focus:border-primary focus:bg-white/10;
-        }
-        .title-cell .editable-label {
-            @apply text-lg font-semibold w-full focus:bg-white/10;
-        }
-        
-        /* Weight control styles */
-        .weight-control {
-            @apply flex items-center justify-center gap-2;
-        }
-        .weight-control button {
-            @apply w-7 h-7 flex items-center justify-center bg-primary text-white rounded-md transition-all hover:bg-primary-hover;
-        }
-        .weight-control input,
-        .matrix-cell input {
-            @apply w-16 text-center py-1 px-2 border border-gray-600 rounded-md text-sm;
-        }
-        
-        /* Button styles */
-        .btn-primary {
-            @apply flex items-center justify-center px-4 py-2 bg-primary text-white rounded-lg font-medium transition-all hover:bg-primary-hover hover:-translate-y-0.5;
-        }
-        .btn-secondary {
-            @apply flex items-center justify-center px-4 py-2 bg-gray-700/50 text-white rounded-lg font-medium transition-all hover:bg-gray-700 hover:-translate-y-0.5 border border-gray-600;
-        }
-
-        /* Matrix container styles */
-        .matrix-container {
-            @apply relative inline-block;
-        }
-        
-        .matrix-edge-buttons {
-            @apply absolute flex gap-2;
-        }
-        
-        .matrix-edge-buttons.right {
-            @apply right-0 top-1/2 -translate-y-1/2 flex-col;
-            transform: translateX(calc(100% + 0.5rem));
-        }
-        
-        .matrix-edge-buttons.bottom {
-            @apply bottom-0 left-1/2 -translate-x-1/2 flex-row;
-            transform: translateY(calc(100% + 0.5rem));
-        }
-        
-        .edge-button {
-            @apply w-8 h-8 flex items-center justify-center bg-gray-700 hover:bg-gray-600 text-gray-100 rounded-lg transition-all border border-gray-600;
-        }
-    </style>
-
+    <!-- Update copyright year -->
     <script>
-        // Initialize the matrix on page load
-        document.addEventListener('DOMContentLoaded', () => createMatrix());
-
-        function createMatrix() {
-            const defaultTitle = "Weighted Matrix";
-            const defaultPrimary = ["P1", "P2", "P3"];
-            const defaultSecondary = ["S1", "S2", "S3", "S4"];
-            
-            // Create matrix container
-            const container = document.createElement('div');
-            container.className = 'matrix-container';
-            
-            // Create matrix table
-            const table = document.createElement('table');
-            table.className = 'matrix-table';
-            
-            // Header row with editable labels
-            const headerRow = document.createElement('tr');
-            
-            // Title cell (top-left)
-            const titleCell = document.createElement('th');
-            titleCell.className = 'title-cell';
-            titleCell.innerHTML = `<input type="text" class="editable-label" value="${defaultTitle}">`;
-            headerRow.appendChild(titleCell);
-            
-            // Secondary condition headers
-            defaultSecondary.forEach(condition => {
-                const th = document.createElement('th');
-                th.innerHTML = `<input type="text" class="editable-label" value="${condition}">`;
-                headerRow.appendChild(th);
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+    </script>
+    
+    <!-- Register service worker for offline support -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker registration failed: ', error);
+                    });
             });
-            table.appendChild(headerRow);
-
-            // Matrix rows
-            defaultPrimary.forEach(condition => {
-                const row = document.createElement('tr');
-                
-                // Primary condition cell with weight control
-                const primaryCell = document.createElement('td');
-                primaryCell.innerHTML = `
-                    <div>
-                        <div style="margin-bottom: 0.5rem;">
-                            <input type="text" class="editable-label" value="${condition}">
-                        </div>
-                        <div class="weight-control">
-                            <button onclick="adjustWeight(this, -1)">-</button>
-                            <input type="number" value="1" min="0" max="10" onchange="updateMatrix()">
-                            <button onclick="adjustWeight(this, 1)">+</button>
-                        </div>
-                    </div>
-                `;
-                row.appendChild(primaryCell);
-
-                // Value cells
-                defaultSecondary.forEach(() => {
-                    const td = document.createElement('td');
-                    td.className = 'matrix-cell';
-                    td.innerHTML = `<input type="number" value="0" min="-10" max="10" onchange="updateMatrix()">`;
-                    row.appendChild(td);
-                });
-
-                table.appendChild(row);
-            });
-
-            // Add edge buttons
-            const rightButtons = document.createElement('div');
-            rightButtons.className = 'matrix-edge-buttons right';
-            rightButtons.innerHTML = `
-                <button class="edge-button" onclick="addRow()" title="Add Row">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                    </svg>
-                </button>
-                <button class="edge-button" onclick="removeRow()" title="Remove Row">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
-                    </svg>
-                </button>
-            `;
-
-            const bottomButtons = document.createElement('div');
-            bottomButtons.className = 'matrix-edge-buttons bottom';
-            bottomButtons.innerHTML = `
-                <button class="edge-button" onclick="addColumn()" title="Add Column">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                    </svg>
-                </button>
-                <button class="edge-button" onclick="removeColumn()" title="Remove Column">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
-                    </svg>
-                </button>
-            `;
-
-            container.appendChild(table);
-            container.appendChild(rightButtons);
-            container.appendChild(bottomButtons);
-
-            // Clear and append new matrix
-            const matrixContainer = document.getElementById('matrixContainer');
-            matrixContainer.innerHTML = '';
-            matrixContainer.appendChild(container);
-
-            updateMatrix();
-        }
-
-        function adjustWeight(button, change) {
-            const input = button.parentElement.querySelector('input');
-            const newValue = Math.max(0, Math.min(10, parseInt(input.value) + change));
-            input.value = newValue;
-            updateMatrix();
-        }
-
-        function updateMatrix() {
-            const cells = document.querySelectorAll('.matrix-cell input');
-            const isDynamicScale = document.getElementById('scaleToggle').checked;
-            
-            // Calculate min and max weighted values for dynamic scale
-            let minWeightedValue = 0;
-            let maxWeightedValue = 0;
-            let hasNonZeroValues = false;
-            
-            cells.forEach(cell => {
-                const row = cell.closest('tr');
-                const weight = parseFloat(row.querySelector('.weight-control input').value);
-                const value = parseFloat(cell.value) || 0;
-                const weightedValue = value * weight;
-                
-                if (weightedValue !== 0) {
-                    hasNonZeroValues = true;
-                    if (minWeightedValue === 0) minWeightedValue = weightedValue;
-                    if (maxWeightedValue === 0) maxWeightedValue = weightedValue;
-                }
-                
-                minWeightedValue = Math.min(minWeightedValue, weightedValue);
-                maxWeightedValue = Math.max(maxWeightedValue, weightedValue);
-            });
-
-            if (!hasNonZeroValues) {
-                minWeightedValue = -1;
-                maxWeightedValue = 1;
-            }
-
-            if (!isDynamicScale) {
-                // Fixed scale -10 to +10
-                const maxWeight = Math.max(...Array.from(document.querySelectorAll('.weight-control input')).map(input => parseFloat(input.value)));
-                minWeightedValue = -10 * maxWeight;
-                maxWeightedValue = 10 * maxWeight;
-            }
-
-            // Ensure we don't divide by zero
-            if (minWeightedValue === 0) minWeightedValue = -1;
-            if (maxWeightedValue === 0) maxWeightedValue = 1;
-
-            // Update scale labels
-            document.getElementById('minLabel').textContent = `Negative Impact (${minWeightedValue.toFixed(1)})`;
-            document.getElementById('maxLabel').textContent = `Positive Impact (+${maxWeightedValue.toFixed(1)})`;
-
-            // Update cell colors
-            cells.forEach(cell => {
-                const row = cell.closest('tr');
-                const weight = parseFloat(row.querySelector('.weight-control input').value);
-                const value = parseFloat(cell.value) || 0;
-                const weightedValue = value * weight;
-                
-                let color;
-                if (weightedValue < 0) {
-                    const intensity = Math.min(Math.abs(weightedValue) / Math.abs(minWeightedValue), 1);
-                    color = `rgba(255, 69, 58, ${intensity})`; // iOS-style red
-                } else if (weightedValue > 0) {
-                    const intensity = Math.min(weightedValue / maxWeightedValue, 1);
-                    color = `rgba(50, 215, 75, ${intensity})`; // iOS-style green
-                } else {
-                    color = 'rgba(255, 255, 255, 0.1)'; // Subtle dark mode neutral
-                }
-                
-                cell.parentElement.style.backgroundColor = color;
-                cell.style.backgroundColor = color;
-            });
-
-            // Update gradient scale
-            const scaleGradient = document.querySelector('.scale-gradient');
-            const gradientStops = [
-                `rgba(255, 69, 58, 1) 0%`,
-                `rgba(255, 69, 58, 0.5) 20%`,
-                `rgba(255, 255, 255, 0.1) 45%`,
-                `rgba(255, 255, 255, 0.1) 55%`,
-                `rgba(50, 215, 75, 0.5) 80%`,
-                `rgba(50, 215, 75, 1) 100%`
-            ].join(',');
-            scaleGradient.style.background = `linear-gradient(to right, ${gradientStops})`;
-        }
-
-        function addRow() {
-            const table = document.querySelector('.matrix-table');
-            const newRow = document.createElement('tr');
-            const columnCount = table.rows[0].cells.length;
-            
-            // Primary condition cell with weight control
-            const primaryCell = document.createElement('td');
-            primaryCell.innerHTML = `
-                <div>
-                    <div style="margin-bottom: 0.5rem;">
-                        <input type="text" class="editable-label" value="P${table.rows.length}">
-                    </div>
-                    <div class="weight-control">
-                        <button onclick="adjustWeight(this, -1)">-</button>
-                        <input type="number" value="1" min="0" max="10" onchange="updateMatrix()">
-                        <button onclick="adjustWeight(this, 1)">+</button>
-                    </div>
-                </div>
-            `;
-            newRow.appendChild(primaryCell);
-
-            // Value cells
-            for (let i = 1; i < columnCount; i++) {
-                const td = document.createElement('td');
-                td.className = 'matrix-cell';
-                td.innerHTML = `<input type="number" value="0" min="-10" max="10" onchange="updateMatrix()">`;
-                newRow.appendChild(td);
-            }
-
-            table.appendChild(newRow);
-            updateMatrix();
-        }
-
-        function removeRow() {
-            const table = document.querySelector('.matrix-table');
-            if (table.rows.length > 2) { // Keep at least one row plus header
-                table.deleteRow(table.rows.length - 1);
-                updateMatrix();
-            }
-        }
-
-        function addColumn() {
-            const table = document.querySelector('.matrix-table');
-            
-            // Add header
-            const headerCell = document.createElement('th');
-            headerCell.innerHTML = `<input type="text" class="editable-label" value="S${table.rows[0].cells.length}">`;
-            table.rows[0].appendChild(headerCell);
-
-            // Add cells to each row
-            for (let i = 1; i < table.rows.length; i++) {
-                const td = document.createElement('td');
-                td.className = 'matrix-cell';
-                td.innerHTML = `<input type="number" value="0" min="-10" max="10" onchange="updateMatrix()">`;
-                table.rows[i].appendChild(td);
-            }
-
-            updateMatrix();
-        }
-
-        function removeColumn() {
-            const table = document.querySelector('.matrix-table');
-            if (table.rows[0].cells.length > 2) { // Keep at least one column plus primary
-                for (let i = 0; i < table.rows.length; i++) {
-                    table.rows[i].deleteCell(table.rows[i].cells.length - 1);
-                }
-                updateMatrix();
-            }
-        }
-
-        function copyAsMarkdown() {
-            const table = document.querySelector('.matrix-table');
-            let markdown = [];
-            
-            // Get headers
-            let headers = [];
-            const headerRow = table.rows[0];
-            for (let i = 0; i < headerRow.cells.length; i++) {
-                const input = headerRow.cells[i].querySelector('.editable-label');
-                headers.push(input.value);
-            }
-            markdown.push('| ' + headers.join(' | ') + ' |');
-            
-            // Add separator
-            markdown.push('| ' + headers.map(() => '---').join(' | ') + ' |');
-            
-            // Get data rows
-            for (let i = 1; i < table.rows.length; i++) {
-                const row = table.rows[i];
-                let rowData = [];
-                
-                // Primary condition and weight
-                const primaryInput = row.cells[0].querySelector('.editable-label');
-                const weightInput = row.cells[0].querySelector('.weight-control input');
-                rowData.push(`${primaryInput.value} (${weightInput.value})`);
-                
-                // Values
-                for (let j = 1; j < row.cells.length; j++) {
-                    const input = row.cells[j].querySelector('input');
-                    const value = parseFloat(input.value);
-                    const weight = parseFloat(weightInput.value);
-                    rowData.push((value * weight).toFixed(1));
-                }
-                
-                markdown.push('| ' + rowData.join(' | ') + ' |');
-            }
-
-            // Copy to clipboard
-            navigator.clipboard.writeText(markdown.join('\n'))
-                .then(() => showToast('Copied to clipboard!'))
-                .catch(err => showToast('Failed to copy: ' + err));
-        }
-
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
         }
     </script>
 </body>

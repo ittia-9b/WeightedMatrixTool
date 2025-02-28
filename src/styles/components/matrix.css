@@ -1,0 +1,209 @@
+/**
+ * Matrix Component Styles
+ */
+
+/* Matrix Container */
+.matrix-container {
+    width: 100%;
+    overflow-x: auto;
+    margin-bottom: var(--spacing-lg);
+    background-color: var(--color-background);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-md);
+}
+
+/* Matrix Controls */
+.matrix-controls {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    padding: var(--spacing-md);
+    background-color: var(--color-background-alt);
+    border-radius: var(--border-radius-md);
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.control-group-title {
+    font-weight: 600;
+    margin-bottom: var(--spacing-xs);
+    color: var(--color-text);
+}
+
+/* Matrix Table */
+.matrix-table-container {
+    overflow-x: auto;
+    padding: var(--spacing-md);
+}
+
+.matrix-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    border: 1px solid var(--color-border);
+}
+
+.matrix-table th,
+.matrix-table td {
+    padding: var(--spacing-sm);
+    border: 1px solid var(--color-border);
+    text-align: center;
+    transition: background-color var(--transition-fast);
+}
+
+/* Title and Header Cells */
+.matrix-table th {
+    background-color: var(--color-background-alt);
+    font-weight: 600;
+    position: relative;
+}
+
+.matrix-table th:first-child {
+    width: 80px;
+    min-width: 80px;
+    max-width: 80px;
+    padding: 0 var(--spacing-xs);
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.matrix-table th:not(:first-child) {
+    width: clamp(40px, 8vw, 100px);
+}
+
+/* Primary Cells (First Column) */
+.matrix-table td:first-child {
+    width: 80px;
+    min-width: 80px;
+    max-width: 80px;
+    padding: 0 var(--spacing-xs);
+    background-color: var(--color-background-alt);
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Matrix Cells */
+.matrix-cell {
+    position: relative;
+    cursor: pointer;
+    transition: background-color var(--transition-normal);
+}
+
+.matrix-cell:hover {
+    opacity: 0.9;
+}
+
+.matrix-cell:active {
+    opacity: 0.8;
+}
+
+/* Base and Weighted Values */
+.base-value,
+.weighted-value {
+    display: block;
+    transition: opacity var(--transition-fast);
+}
+
+.base-value {
+    font-size: var(--font-size-md);
+    font-weight: 500;
+}
+
+.weighted-value {
+    font-size: var(--font-size-sm);
+    opacity: 0.7;
+    margin-top: var(--spacing-xs);
+}
+
+/* Weight Controls */
+.weight-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background-color: var(--color-background);
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--color-border);
+    cursor: pointer;
+    user-select: none;
+    font-size: var(--font-size-sm);
+    transition: background-color var(--transition-fast);
+}
+
+.weight-control:hover {
+    background-color: var(--color-background-alt);
+}
+
+.weight-control span {
+    font-weight: 600;
+}
+
+/* Editable Labels */
+.editable-label {
+    width: 100%;
+    padding: var(--spacing-xs);
+    border: none;
+    background: transparent;
+    text-align: center;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    outline: none;
+    transition: background-color var(--transition-fast);
+}
+
+.editable-label:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.editable-label:focus {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.dark .editable-label:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .editable-label:focus {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .matrix-controls {
+        grid-template-columns: 1fr;
+    }
+    
+    .matrix-table th:not(:first-child),
+    .matrix-table td:not(:first-child) {
+        min-width: 60px;
+    }
+    
+    .base-value,
+    .weighted-value {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .matrix-table-container {
+        padding: var(--spacing-sm);
+    }
+    
+    .matrix-table th,
+    .matrix-table td {
+        padding: var(--spacing-xs);
+    }
+    
+    .matrix-table th:not(:first-child),
+    .matrix-table td:not(:first-child) {
+        min-width: 50px;
+    }
+} 

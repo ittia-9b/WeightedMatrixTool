@@ -1,0 +1,160 @@
+/**
+ * Export Component Styles
+ */
+
+/* Export Section */
+.export-section {
+    background-color: var(--color-background-alt);
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.export-title {
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--color-text);
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: var(--spacing-sm);
+}
+
+/* Export Controls */
+.export-controls {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+.export-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-md);
+    font-size: var(--font-size-md);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.export-button:hover {
+    background-color: var(--color-primary-dark);
+    transform: translateY(-2px);
+}
+
+.export-button:active {
+    transform: translateY(0);
+}
+
+.export-button svg {
+    margin-right: var(--spacing-sm);
+}
+
+.copy-button {
+    background-color: var(--color-success);
+}
+
+.copy-button:hover {
+    background-color: #0d9668; /* Darker success color */
+}
+
+.copy-button.hidden {
+    display: none;
+}
+
+/* Export Preview */
+.export-preview-container {
+    margin-top: var(--spacing-md);
+}
+
+.export-preview {
+    width: 100%;
+    min-height: 200px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: var(--spacing-md);
+    background-color: var(--color-background);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    font-family: monospace;
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: var(--color-text);
+}
+
+.export-preview:empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-light);
+    font-style: italic;
+}
+
+.export-preview:empty::before {
+    content: "Click 'Convert to Markdown' to see the preview";
+}
+
+/* Export Format Options */
+.export-format-options {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.format-option {
+    display: flex;
+    align-items: center;
+}
+
+.format-option input {
+    margin-right: var(--spacing-xs);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .export-controls {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+    
+    .export-button {
+        width: 100%;
+    }
+    
+    .export-preview {
+        min-height: 150px;
+        max-height: 300px;
+    }
+}
+
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent-color);
+    color: var(--text-primary);
+    padding: 1rem 2rem;
+    border-radius: var(--border-radius);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1000;
+}
+
+.toast.show {
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    .export-controls {
+        flex-direction: column;
+    }
+} 
