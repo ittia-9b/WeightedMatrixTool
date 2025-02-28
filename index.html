@@ -5,22 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weighted Matrix Tool</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            DEFAULT: '#007AFF',
-                            hover: '#0056b3'
-                        },
-                        danger: '#FF453A',
-                        success: '#32D74B',
-                    }
-                }
-            }
-        }
+    <link rel="stylesheet" href="src/styles/main.css">
+    <script type="module">
+        import { WeightedMatrix } from './src/js/matrix.js';
+        import config from './src/js/config.js';
+
+        // Configure Tailwind
+        tailwind.config = config;
+
+        // Initialize the matrix when the DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            window.matrix = new WeightedMatrix();
+        });
     </script>
 </head>
 <body class="h-full text-gray-100">
