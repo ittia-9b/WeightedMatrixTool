@@ -1,0 +1,84 @@
+/* Base styles for matrix table */
+.matrix-table {
+    @apply w-full border-separate border-spacing-1 relative;
+}
+.matrix-table th, .matrix-table td {
+    @apply p-3 text-center bg-gray-700/50 rounded-lg text-gray-100;
+}
+.matrix-table th {
+    @apply bg-primary/90 font-semibold;
+}
+.matrix-table td:first-child {
+    @apply text-right bg-gray-700/80;
+}
+.title-cell {
+    @apply bg-primary/90 font-semibold;
+}
+
+/* Input styles */
+.matrix-table input {
+    @apply bg-transparent text-gray-100 placeholder-gray-400;
+}
+
+.matrix-cell input {
+    @apply text-gray-100;
+}
+
+.editable-label {
+    @apply border border-transparent rounded px-2 py-1 text-center min-w-[60px] transition-all duration-200 hover:border-gray-600 focus:outline-none focus:border-primary focus:bg-transparent/10;
+}
+.title-cell .editable-label {
+    @apply text-lg font-semibold w-full focus:bg-white/10;
+}
+
+/* Weight control styles */
+.weight-control {
+    @apply flex items-center justify-center gap-2;
+}
+.weight-control button {
+    @apply w-7 h-7 flex items-center justify-center bg-primary text-white rounded-md transition-all hover:bg-primary-hover;
+}
+.weight-control input,
+.matrix-cell input {
+    @apply w-16 text-center py-1 px-2 border border-gray-600 rounded-md text-sm;
+}
+
+/* Button styles */
+.btn-primary {
+    @apply flex items-center justify-center px-4 py-2 bg-primary text-white rounded-lg font-medium transition-all hover:bg-primary-hover hover:-translate-y-0.5;
+}
+.btn-secondary {
+    @apply flex items-center justify-center px-4 py-2 bg-gray-700/50 text-white rounded-lg font-medium transition-all hover:bg-gray-700 hover:-translate-y-0.5 border border-gray-600;
+}
+
+/* Matrix container styles */
+.matrix-container {
+    @apply relative inline-block;
+}
+
+.matrix-edge-buttons {
+    @apply absolute flex gap-2;
+}
+
+.matrix-edge-buttons.right {
+    @apply right-0 top-1/2 -translate-y-1/2 flex-col;
+    transform: translateX(calc(100% + 0.5rem));
+}
+
+.matrix-edge-buttons.bottom {
+    @apply bottom-0 left-1/2 -translate-x-1/2 flex-row;
+    transform: translateY(calc(100% + 0.5rem));
+}
+
+.edge-button {
+    @apply w-8 h-8 flex items-center justify-center bg-gray-700 hover:bg-gray-600 text-gray-100 rounded-lg transition-all border border-gray-600;
+}
+
+/* Toast notification */
+.toast {
+    @apply fixed bottom-4 left-1/2 -translate-x-1/2 opacity-0 transition-opacity duration-300 bg-primary text-white px-6 py-3 rounded-lg shadow-lg;
+}
+
+.toast.show {
+    @apply opacity-100;
+} 
