@@ -1,411 +1,178 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-gray-900">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weighted Matrix Tool</title>
-    <style>
-        :root {
-            --bg-primary: #1a1a1a;
-            --bg-secondary: #2d2d2d;
-            --text-primary: #ffffff;
-            --text-secondary: #b3b3b3;
-            --accent-color: #007AFF;
-            --border-color: #404040;
-            --danger-color: #FF453A;
-            --success-color: #32D74B;
-            --input-bg: #3d3d3d;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.5;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* Matrix Screen Styles */
-        #matrixScreen {
-            background: var(--bg-secondary);
-            padding: 2rem;
-            border-radius: 16px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.2);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-        }
-
-        .matrix-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 2px;
-            margin-bottom: 2rem;
-        }
-
-        .matrix-table th, .matrix-table td {
-            padding: 1rem;
-            text-align: center;
-            background: var(--input-bg);
-            border-radius: 8px;
-        }
-
-        .matrix-table th {
-            background: var(--accent-color);
-            color: var(--text-primary);
-            font-weight: 600;
-        }
-
-        .weight-control {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .weight-control button {
-            width: 28px;
-            height: 28px;
-            border: none;
-            background: var(--accent-color);
-            color: var(--text-primary);
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-        }
-
-        .weight-control button:hover {
-            background: #0056b3;
-        }
-
-        .weight-control input,
-        .matrix-cell input {
-            width: 60px;
-            text-align: center;
-            padding: 0.5rem;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            background: var(--input-bg);
-            color: var(--text-primary);
-            font-size: 0.95rem;
-        }
-
-        button {
-            padding: 0.75rem 1.5rem;
-            background: var(--accent-color);
-            color: var(--text-primary);
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-
-        button:hover {
-            background: #0056b3;
-            transform: translateY(-1px);
-        }
-
-        /* Heatmap Scale */
-        .heatmap-scale {
-            margin-top: 2rem;
-            padding: 1rem;
-            background: var(--input-bg);
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .scale-header {
-            width: 100%;
-            max-width: 600px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .scale-mode-toggle {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem;
-            background: var(--bg-secondary);
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-        }
-
-        .mode-label {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 44px;
-            height: 24px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: var(--input-bg);
-            transition: .4s;
-            border-radius: 24px;
-        }
-
-        .toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: var(--text-primary);
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        .toggle-switch input:checked + .toggle-slider {
-            background-color: var(--accent-color);
-        }
-
-        .toggle-switch input:checked + .toggle-slider:before {
-            transform: translateX(20px);
-        }
-
-        .scale-container {
-            width: 100%;
-            max-width: 600px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            position: relative;
-        }
-
-        .scale-gradient {
-            width: 100%;
-            height: 20px;
-            background: linear-gradient(to right, 
-                rgba(255, 69, 58, 1) 0%,
-                rgba(255, 69, 58, 0.5) 20%,
-                rgba(255, 255, 255, 0.1) 45%,
-                rgba(255, 255, 255, 0.1) 55%,
-                rgba(50, 215, 75, 0.5) 80%,
-                rgba(50, 215, 75, 1) 100%
-            );
-            border-radius: 4px;
-        }
-
-        .scale-labels {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
-        }
-
-        .scale-title {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .editable-label {
-            background: none;
-            border: 1px solid transparent;
-            color: var(--text-primary);
-            font-size: 1rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            cursor: text;
-            transition: all 0.2s ease;
-            width: auto;
-            min-width: 60px;
-        }
-
-        .editable-label:hover {
-            border-color: var(--border-color);
-        }
-
-        .editable-label:focus {
-            outline: none;
-            border-color: var(--accent-color);
-            background: var(--input-bg);
-        }
-
-        .title-cell {
-            background: var(--accent-color) !important;
-            font-weight: 600;
-        }
-
-        .title-cell .editable-label {
-            font-size: 1.2rem;
-            font-weight: 600;
-            text-align: center;
-            width: 100%;
-            background: none;
-        }
-
-        .title-cell .editable-label:focus {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        /* Add these new styles */
-        .action-buttons {
-            display: flex;
-            gap: 1rem;
-            margin-top: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .action-buttons button {
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .matrix-controls {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .matrix-controls button {
-            flex: 1;
-            min-width: 150px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-        }
-
-        .matrix-controls button:hover {
-            background: var(--input-bg);
-        }
-
-        /* Responsive design adjustments */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-
-            .matrix-table {
-                font-size: 0.9rem;
-            }
-
-            .matrix-table th, .matrix-table td {
-                padding: 0.5rem;
-            }
-
-            .weight-control {
-                flex-direction: column;
-            }
-
-            .weight-control button {
-                width: 24px;
-                height: 24px;
-            }
-
-            .weight-control input,
-            .matrix-cell input {
-                width: 50px;
-                padding: 0.25rem;
-            }
-
-            .action-buttons,
-            .matrix-controls {
-                flex-direction: column;
-            }
-
-            .action-buttons button,
-            .matrix-controls button {
-                width: 100%;
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: '#007AFF',
+                            hover: '#0056b3'
+                        },
+                        danger: '#FF453A',
+                        success: '#32D74B',
+                    }
+                }
             }
         }
-
-        /* Toast notification */
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--accent-color);
-            color: var(--text-primary);
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            z-index: 1000;
-        }
-
-        .toast.show {
-            opacity: 1;
-        }
-    </style>
+    </script>
 </head>
-<body>
-    <div class="container">
-        <div id="matrixScreen">
-            <div class="matrix-controls">
-                <button onclick="addRow()">Add Row</button>
-                <button onclick="removeRow()">Remove Row</button>
-                <button onclick="addColumn()">Add Column</button>
-                <button onclick="removeColumn()">Remove Column</button>
-            </div>
-            <div id="matrixContainer"></div>
-            
-            <!-- Heatmap Scale -->
-            <div class="heatmap-scale">
-                <div class="scale-header">
-                    <div class="scale-title">Weighted Value Scale</div>
-                    <div class="scale-mode-toggle">
-                        <span class="mode-label">Dynamic Scale</span>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="scaleToggle" onchange="updateMatrix()" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
+<body class="h-full text-gray-100">
+    <div class="min-h-full p-4 sm:p-6 lg:p-8">
+        <div class="mx-auto max-w-7xl">
+            <div id="matrixScreen" class="bg-gray-800 rounded-2xl shadow-xl p-6">
+                <!-- Matrix Controls -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                    <button onclick="addRow()" class="btn-secondary">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Add Row
+                    </button>
+                    <button onclick="removeRow()" class="btn-secondary">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                        </svg>
+                        Remove Row
+                    </button>
+                    <button onclick="addColumn()" class="btn-secondary">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Add Column
+                    </button>
+                    <button onclick="removeColumn()" class="btn-secondary">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                        </svg>
+                        Remove Column
+                    </button>
+                </div>
+
+                <!-- Matrix Container -->
+                <div class="overflow-x-auto">
+                    <div id="matrixContainer" class="min-w-full"></div>
+                </div>
+
+                <!-- Heatmap Scale -->
+                <div class="mt-8 bg-gray-700/50 rounded-xl p-4">
+                    <div class="max-w-2xl mx-auto">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-sm font-medium text-gray-300">Weighted Value Scale</span>
+                            <div class="flex items-center gap-3 bg-gray-800 rounded-lg p-2">
+                                <span class="text-sm text-gray-300">Dynamic Scale</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="scaleToggle" class="sr-only peer" checked onchange="updateMatrix()">
+                                    <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="h-5 rounded bg-gradient-to-r from-danger via-gray-700/20 to-success"></div>
+                        <div class="flex justify-between mt-2 text-sm text-gray-400">
+                            <span id="minLabel">Negative Impact (-10)</span>
+                            <span>Neutral (0)</span>
+                            <span id="maxLabel">Positive Impact (+10)</span>
+                        </div>
                     </div>
                 </div>
-                <div class="scale-container">
-                    <div class="scale-gradient"></div>
-                </div>
-                <div class="scale-labels">
-                    <span id="minLabel">Negative Impact (-10)</span>
-                    <span>Neutral (0)</span>
-                    <span id="maxLabel">Positive Impact (+10)</span>
-                </div>
-            </div>
 
-            <div class="action-buttons">
-                <button onclick="createMatrix()">Start Over</button>
-                <button onclick="copyAsMarkdown()">Copy as Markdown</button>
+                <!-- Action Buttons -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-8">
+                    <button onclick="createMatrix()" class="btn-primary">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        Start Over
+                    </button>
+                    <button onclick="copyAsMarkdown()" class="btn-primary">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                        </svg>
+                        Copy as Markdown
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="toast" class="toast"></div>
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 opacity-0 transition-opacity duration-300 bg-primary text-white px-6 py-3 rounded-lg shadow-lg"></div>
+
+    <style>
+        /* Base styles for matrix table */
+        .matrix-table {
+            @apply w-full border-separate border-spacing-1 relative;
+        }
+        .matrix-table th, .matrix-table td {
+            @apply p-3 text-center bg-gray-700/50 rounded-lg text-gray-100;
+        }
+        .matrix-table th {
+            @apply bg-primary font-semibold;
+        }
+        .matrix-table td:first-child {
+            @apply text-right;
+        }
+        .title-cell {
+            @apply bg-primary font-semibold;
+        }
+        
+        /* Input styles */
+        .editable-label {
+            @apply bg-transparent border border-transparent rounded px-2 py-1 text-center min-w-[60px] transition-all duration-200 hover:border-gray-600 focus:outline-none focus:border-primary focus:bg-gray-700/50 text-gray-100;
+        }
+        .title-cell .editable-label {
+            @apply text-lg font-semibold w-full focus:bg-white/10 text-gray-100;
+        }
+        
+        /* Weight control styles */
+        .weight-control {
+            @apply flex items-center justify-center gap-2;
+        }
+        .weight-control button {
+            @apply w-7 h-7 flex items-center justify-center bg-primary text-white rounded-md transition-all hover:bg-primary-hover;
+        }
+        .weight-control input,
+        .matrix-cell input {
+            @apply w-16 text-center py-1 px-2 bg-transparent border border-gray-600 rounded-md text-sm text-gray-100;
+        }
+        
+        /* Button styles */
+        .btn-primary {
+            @apply flex items-center justify-center px-4 py-2 bg-primary text-white rounded-lg font-medium transition-all hover:bg-primary-hover hover:-translate-y-0.5;
+        }
+        .btn-secondary {
+            @apply flex items-center justify-center px-4 py-2 bg-gray-700/50 text-white rounded-lg font-medium transition-all hover:bg-gray-700 hover:-translate-y-0.5 border border-gray-600;
+        }
+
+        /* Matrix container styles */
+        .matrix-container {
+            @apply relative inline-block;
+        }
+        
+        .matrix-edge-buttons {
+            @apply absolute flex gap-2;
+        }
+        
+        .matrix-edge-buttons.right {
+            @apply right-0 top-1/2 -translate-y-1/2 flex-col;
+            transform: translateX(calc(100% + 0.5rem));
+        }
+        
+        .matrix-edge-buttons.bottom {
+            @apply bottom-0 left-1/2 -translate-x-1/2 flex-row;
+            transform: translateY(calc(100% + 0.5rem));
+        }
+        
+        .edge-button {
+            @apply w-8 h-8 flex items-center justify-center bg-gray-700 hover:bg-gray-600 text-gray-100 rounded-lg transition-all border border-gray-600;
+        }
+    </style>
 
     <script>
         // Initialize the matrix on page load
@@ -415,6 +182,10 @@
             const defaultTitle = "Weighted Matrix";
             const defaultPrimary = ["P1", "P2", "P3"];
             const defaultSecondary = ["S1", "S2", "S3", "S4"];
+            
+            // Create matrix container
+            const container = document.createElement('div');
+            container.className = 'matrix-container';
             
             // Create matrix table
             const table = document.createElement('table');
@@ -468,10 +239,45 @@
                 table.appendChild(row);
             });
 
+            // Add edge buttons
+            const rightButtons = document.createElement('div');
+            rightButtons.className = 'matrix-edge-buttons right';
+            rightButtons.innerHTML = `
+                <button class="edge-button" onclick="addRow()" title="Add Row">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                </button>
+                <button class="edge-button" onclick="removeRow()" title="Remove Row">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                    </svg>
+                </button>
+            `;
+
+            const bottomButtons = document.createElement('div');
+            bottomButtons.className = 'matrix-edge-buttons bottom';
+            bottomButtons.innerHTML = `
+                <button class="edge-button" onclick="addColumn()" title="Add Column">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                </button>
+                <button class="edge-button" onclick="removeColumn()" title="Remove Column">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                    </svg>
+                </button>
+            `;
+
+            container.appendChild(table);
+            container.appendChild(rightButtons);
+            container.appendChild(bottomButtons);
+
             // Clear and append new matrix
             const matrixContainer = document.getElementById('matrixContainer');
             matrixContainer.innerHTML = '';
-            matrixContainer.appendChild(table);
+            matrixContainer.appendChild(container);
 
             updateMatrix();
         }
