@@ -4,7 +4,7 @@ const config = {
         extend: {
             colors: {
                 primary: {
-                    DEFAULT: '#007AFF',
+                    DEFAULT: '#0000FF',
                     hover: '#0056b3'
                 },
                 danger: '#FF453A',
