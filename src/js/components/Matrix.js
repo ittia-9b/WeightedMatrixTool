@@ -10,8 +10,8 @@ export class Matrix {
      * @param {string} [options.title='WMT'] - Default title for the matrix
      * @param {string[]} [options.primaryLabels=['P1', 'P2', 'P3']] - Default primary row labels
      * @param {string[]} [options.secondaryLabels=['S1', 'S2', 'S3', 'S4']] - Default secondary column labels
-     * @param {number} [options.defaultWeight=1.0] - Default weight for primary items
-     * @param {number} [options.defaultValue=0.0] - Default value for matrix cells
+     * @param {number} [options.defaultWeight=1] - Default weight for primary items
+     * @param {number} [options.defaultValue=0] - Default value for matrix cells
      * @param {number} [options.minValue=-10] - Minimum allowed value
      * @param {number} [options.maxValue=10] - Maximum allowed value
      */
@@ -22,8 +22,8 @@ export class Matrix {
             title: options.title || 'WMT',
             primaryLabels: options.primaryLabels || ['P1', 'P2', 'P3'],
             secondaryLabels: options.secondaryLabels || ['S1', 'S2', 'S3', 'S4'],
-            defaultWeight: options.defaultWeight || 1.0,
-            defaultValue: options.defaultValue || 0.0,
+            defaultWeight: options.defaultWeight || 1,
+            defaultValue: options.defaultValue || 0,
             minValue: options.minValue || -10,
             maxValue: options.maxValue || 10
         };
@@ -76,12 +76,13 @@ export class Matrix {
             this.state.colorOpacity = this.elements.opacitySlider.value / 100;
             this.updateMatrix();
         });
-        
+
         // Update opacity value display
         this.elements.opacitySlider?.addEventListener('input', () => {
             const opacityValue = document.getElementById('opacityValue');
             if (opacityValue) {
                 opacityValue.textContent = `${this.elements.opacitySlider.value}%`;
+                this.updateMatrix();
             }
         });
     }
@@ -94,11 +95,11 @@ export class Matrix {
     createHeaderRow() {
         const headerRow = document.createElement('tr');
         headerRow.appendChild(this.createTitleCell());
-        
+
         this.config.secondaryLabels.forEach(label => {
             headerRow.appendChild(this.createHeaderCell(label));
         });
-        
+
         this.elements.table.appendChild(headerRow);
     }
 
@@ -131,11 +132,11 @@ export class Matrix {
         this.config.primaryLabels.forEach(label => {
             const row = document.createElement('tr');
             row.appendChild(this.createPrimaryCell(label));
-            
+
             this.config.secondaryLabels.forEach(() => {
                 row.appendChild(this.createMatrixCell());
             });
-            
+
             this.elements.table.appendChild(row);
         });
     }
@@ -152,7 +153,7 @@ export class Matrix {
             <div>
                 <input type="text" class="editable-label" value="${label}">
                 <div class="weight-control">
-                    <span>${this.config.defaultWeight.toFixed(1)}</span>
+                    <span>${this.config.defaultWeight}</span>
                 </div>
             </div>
         `;
@@ -168,8 +169,8 @@ export class Matrix {
         const cell = document.createElement('td');
         cell.className = 'matrix-cell';
         cell.innerHTML = `
-            <span class="base-value">${this.config.defaultValue.toFixed(1)}</span>
-            <span class="weighted-value">${this.config.defaultValue.toFixed(1)}</span>
+            <span class="base-value">${this.config.defaultValue}</span>
+            <span class="weighted-value">${this.config.defaultValue}</span>
         `;
         this.setupCellControl(cell);
         return cell;
@@ -184,24 +185,24 @@ export class Matrix {
     setupWeightControl(cell) {
         const weightControl = cell.querySelector('.weight-control');
         const weightSpan = weightControl.querySelector('span');
-        
+
         if (!weightControl || !weightSpan) return;
-        
+
         const handleWeightChange = (e) => {
             e.preventDefault();
-            const currentValue = parseFloat(weightSpan.textContent) || this.config.defaultWeight;
+            const currentValue = parseInt(weightSpan.textContent) || this.config.defaultWeight;
             let newValue = currentValue;
-            
+
             if (e.button === 0) { // Left click
                 newValue = Math.min(this.config.maxValue, currentValue + 1);
             } else if (e.button === 2) { // Right click
                 newValue = Math.max(-this.config.maxValue, currentValue - 1);
             }
-            
-            weightSpan.textContent = newValue.toFixed(1);
+
+            weightSpan.textContent = newValue.toString();
             this.updateMatrix();
         };
-        
+
         weightControl.addEventListener('mousedown', handleWeightChange);
         weightControl.addEventListener('contextmenu', e => e.preventDefault());
     }
@@ -212,29 +213,26 @@ export class Matrix {
      */
     setupCellControl(cell) {
         if (!cell) return;
-        
+
         const handleValueChange = (e) => {
             e.preventDefault();
             const baseValue = cell.querySelector('.base-value');
             if (!baseValue) return;
-            
-            const currentValue = parseFloat(baseValue.textContent) || this.config.defaultValue;
+
+            const currentValue = parseInt(baseValue.textContent) || this.config.defaultValue;
             let newValue = currentValue;
-            
+
             if (e.button === 0) { // Left click
                 newValue = Math.min(this.config.maxValue, currentValue + 1);
             } else if (e.button === 2) { // Right click
                 newValue = Math.max(this.config.minValue, currentValue - 1);
             }
-            
+
             // Update the cell value
             this.updateCellValue(cell, newValue);
-            
-            // If in dynamic scale mode, we need to update the entire matrix
-            // since the range of values may have changed
-            if (this.state.isDynamicScale) {
-                this.updateMatrix();
-            }
+
+            // Always update the entire matrix
+            this.updateMatrix();
         };
 
         cell.addEventListener('mousedown', handleValueChange);
@@ -250,27 +248,23 @@ export class Matrix {
      */
     updateCellValue(cell, value) {
         if (!cell) return;
-        
+
         const baseValue = cell.querySelector('.base-value');
         const weightedValue = cell.querySelector('.weighted-value');
         const row = cell.closest('tr');
-        
+
         if (!baseValue || !weightedValue || !row) return;
-        
+
         const weightSpan = row.cells[0]?.querySelector('.weight-control span');
         if (!weightSpan) return;
-        
-        const weight = parseFloat(weightSpan.textContent) || this.config.defaultWeight;
+
+        const weight = parseInt(weightSpan.textContent) || this.config.defaultWeight;
         const weightedProduct = value * weight;
-        
-        baseValue.textContent = value.toFixed(1);
-        weightedValue.textContent = weightedProduct.toFixed(1);
-        
-        // Only update the cell color if we're not in dynamic scale mode
-        // If we are in dynamic scale mode, the full matrix update will handle it
-        if (!this.state.isDynamicScale) {
-            this.updateCellColor(cell, value, weightedProduct);
-        }
+
+        baseValue.textContent = value.toString();
+        weightedValue.textContent = weightedProduct.toString();
+
+        this.updateMatrix();
     }
 
     /**
@@ -281,16 +275,16 @@ export class Matrix {
      */
     updateCellColor(cell, baseValue, weightedValue) {
         if (!cell) return;
-        
+
         const { min, max } = this.getWeightedRange();
         const valueToUse = this.state.isDynamicScale ? weightedValue : baseValue;
         const minToUse = this.state.isDynamicScale ? min : this.config.minValue;
         const maxToUse = this.state.isDynamicScale ? max : this.config.maxValue;
-        
+
         cell.style.backgroundColor = getHeatmapColor(
-            valueToUse, 
-            minToUse, 
-            maxToUse, 
+            valueToUse,
+            minToUse,
+            maxToUse,
             this.state.colorOpacity
         );
     }
@@ -301,20 +295,20 @@ export class Matrix {
     updateMatrix() {
         // First, get the weighted range for dynamic scaling
         const { min, max } = this.getWeightedRange();
-        
+
         // Update the heatmap scale labels
         this.updateHeatmapScale(min, max);
-        
+
         // Update all cells
         const cells = this.elements.table.querySelectorAll('.matrix-cell');
         cells.forEach(cell => {
             const baseValue = cell.querySelector('.base-value');
             const weightedValue = cell.querySelector('.weighted-value');
-            
+
             if (baseValue && weightedValue) {
-                const baseVal = parseFloat(baseValue.textContent) || this.config.defaultValue;
-                const weightedVal = parseFloat(weightedValue.textContent) || this.config.defaultValue;
-                
+                const baseVal = parseInt(baseValue.textContent) || this.config.defaultValue;
+                const weightedVal = parseInt(weightedValue.textContent) || this.config.defaultValue;
+
                 // Update the cell color based on the current scale mode
                 this.updateCellColor(cell, baseVal, weightedVal);
             }
@@ -328,11 +322,11 @@ export class Matrix {
      */
     updateHeatmapScale(min, max) {
         if (this.elements.minLabel) {
-            this.elements.minLabel.textContent = `Negative Impact (${min.toFixed(1)})`;
+            this.elements.minLabel.textContent = `Negative Impact (${min})`;
         }
-        
+
         if (this.elements.maxLabel) {
-            this.elements.maxLabel.textContent = `Positive Impact (+${max.toFixed(1)})`;
+            this.elements.maxLabel.textContent = `Positive Impact (+${max})`;
         }
     }
 
@@ -345,22 +339,22 @@ export class Matrix {
     getWeightedRange() {
         if (!this.state.isDynamicScale) {
             const weights = Array.from(this.elements.table.querySelectorAll('.weight-control span'))
-                .map(span => Math.abs(parseFloat(span.textContent) || this.config.defaultWeight));
-            
+                .map(span => Math.abs(parseInt(span.textContent) || this.config.defaultWeight));
+
             const maxWeight = weights.length > 0 ? Math.max(...weights) : this.config.defaultWeight;
-            return { 
-                min: this.config.minValue * maxWeight, 
-                max: this.config.maxValue * maxWeight 
+            return {
+                min: this.config.minValue * maxWeight,
+                max: this.config.maxValue * maxWeight
             };
         }
-        
+
         const values = Array.from(this.elements.table.querySelectorAll('.weighted-value'))
-            .map(el => parseFloat(el.textContent) || 0);
-        
+            .map(el => parseInt(el.textContent) || 0);
+
         if (values.length === 0) {
             return { min: -1, max: 1 };
         }
-        
+
         return {
             min: Math.min(...values),
             max: Math.max(...values)
@@ -374,25 +368,25 @@ export class Matrix {
     getMatrixData() {
         const headerRow = this.elements.table.rows[0];
         const title = headerRow.cells[0].querySelector('input').value;
-        
-        const headers = Array.from(headerRow.cells).slice(1).map(cell => 
+
+        const headers = Array.from(headerRow.cells).slice(1).map(cell =>
             cell.querySelector('input').value
         );
-        
+
         const rows = [];
         for (let i = 1; i < this.elements.table.rows.length; i++) {
             const row = this.elements.table.rows[i];
             const label = row.cells[0].querySelector('input').value;
-            const weight = parseFloat(row.cells[0].querySelector('.weight-control span').textContent);
-            
+            const weight = parseInt(row.cells[0].querySelector('.weight-control span').textContent);
+
             const values = Array.from(row.cells).slice(1).map(cell => ({
-                base: parseFloat(cell.querySelector('.base-value').textContent),
-                weighted: parseFloat(cell.querySelector('.weighted-value').textContent)
+                base: parseInt(cell.querySelector('.base-value').textContent),
+                weighted: parseInt(cell.querySelector('.weighted-value').textContent)
             }));
-            
+
             rows.push({ label, weight, values });
         }
-        
+
         return { title, headers, rows };
     }
 
@@ -405,17 +399,17 @@ export class Matrix {
         const row = document.createElement('tr');
         const newIndex = this.elements.table.rows.length;
         const label = `P${newIndex}`;
-        
+
         row.appendChild(this.createPrimaryCell(label));
-        
+
         const numCols = this.elements.table.rows[0].cells.length - 1;
         for (let i = 0; i < numCols; i++) {
             row.appendChild(this.createMatrixCell());
         }
-        
+
         this.elements.table.appendChild(row);
         this.updateMatrix();
-        
+
         return row;
     }
 
@@ -426,13 +420,13 @@ export class Matrix {
         const headerRow = this.elements.table.rows[0];
         const newIndex = headerRow.cells.length;
         const label = `S${newIndex}`;
-        
+
         headerRow.appendChild(this.createHeaderCell(label));
-        
+
         for (let i = 1; i < this.elements.table.rows.length; i++) {
             this.elements.table.rows[i].appendChild(this.createMatrixCell());
         }
-        
+
         this.updateMatrix();
     }
 
@@ -464,7 +458,7 @@ export class Matrix {
         while (this.elements.table.firstChild) {
             this.elements.table.removeChild(this.elements.table.firstChild);
         }
-        
+
         // Rebuild the matrix
         this.init();
     }
